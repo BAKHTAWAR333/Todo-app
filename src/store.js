@@ -1,36 +1,23 @@
 import { configureStore, createSlice } from "@reduxjs/toolkit";
 
-// Step 1: Create a "slice" for todos
-const todosSlice = createSlice({
-  name: "todos",
-  initialState: JSON.parse(localStorage.getItem("todos")) || [],
+const slice = createSlice({
+  name: "todo",
+  initialState: [],
   reducers: {
     addTodo: (state, action) => {
-      state.push({ text: action.payload, completed: false });
+      state.push({ id: Date.now(), text: action.payload, done: false });
     },
     toggleTodo: (state, action) => {
-      const todo = state[action.payload];
-      if (todo) todo.completed = !todo.completed;
+      state.find(t => t.id === action.payload).done ^= true;
     },
     deleteTodo: (state, action) => {
-      state.splice(action.payload, 1);
+      return state.filter(t => t.id !== action.payload);
     },
   },
 });
 
-// Step 2: Export actions
-export const { addTodo, toggleTodo, deleteTodo } = todosSlice.actions;
+export const { addTodo, toggleTodo, deleteTodo } = slice.actions;
 
-// Step 3: Create the store
-const store = configureStore({
-  reducer: {
-    todos: todosSlice.reducer,
-  },
+export const store = configureStore({
+  reducer: slice.reducer,
 });
-
-// Step 4: Save todos to localStorage whenever state changes
-store.subscribe(() => {
-  localStorage.setItem("todos", JSON.stringify(store.getState().todos));
-});
-
-export default store;

@@ -1,46 +1,42 @@
-import { useSelector, useDispatch } from "react-redux";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { addTodo, toggleTodo, deleteTodo } from "./store";
-import "./App.css";
 
-function App() {
-  const todos = useSelector((state) => state.todos); // get todos from store
-  const dispatch = useDispatch(); // to send actions
-  const [input, setInput] = useState(""); // for input field
-
-  const handleAdd = (e) => {
-    e.preventDefault();
-    if (!input.trim()) return; // ignore empty input
-    dispatch(addTodo(input.trim()));
-    setInput("");
-  };
+export default function App() {
+  const [text, setText] = useState("");
+  const todos = useSelector(state => state);
+  const dispatch = useDispatch();
 
   return (
-    <div className="app">
-      <h1>My To-Do List</h1>
+    <div>
+      <h2>Todo App</h2>
 
-      <form onSubmit={handleAdd}>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Add a new task"
-        />
-        <button type="submit">Add</button>
-      </form>
+      <input
+        value={text}
+        onChange={e => setText(e.target.value)}
+      />
 
-      <ul>
-        {todos.map((todo, index) => (
-          <li key={index} className={todo.completed ? "completed" : ""}>
-            <span onClick={() => dispatch(toggleTodo(index))}>
-              {todo.text}
-            </span>
-            <button onClick={() => dispatch(deleteTodo(index))}>✕</button>
-          </li>
-        ))}
-      </ul>
+      <button onClick={() => {
+        dispatch(addTodo(text));
+        setText("");
+      }}>
+        Add
+      </button>
+
+      {todos.map(t => (
+        <div key={t.id}>
+          <span
+            onClick={() => dispatch(toggleTodo(t.id))}
+            style={{ textDecoration: t.done ? "line-through" : "none" }}
+          >
+            {t.text}
+          </span>
+
+          <button onClick={() => dispatch(deleteTodo(t.id))}>
+            X
+          </button>
+        </div>
+      ))}
     </div>
   );
 }
-
-export default App;
